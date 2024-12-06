@@ -1,0 +1,38 @@
+services:
+  broker-1:
+    image: emqx/nanomq:0.18.2-full
+    container_name: region-a-broker-1
+    networks:
+      region-a:
+        ipv4_address: 192.168.1.10
+      region-b:
+        ipv4_address: 192.168.2.20
+    ports:
+      - '1883:1883'
+      - '8081:8081'
+      - '8883:8883'
+
+  broker-2:
+    image: emqx/nanomq:0.18.2-full
+    container_name: region-b-broker-2
+    networks:
+      region-a:
+        ipv4_address: 192.168.1.20
+      region-b:
+        ipv4_address: 192.168.2.10
+    ports:
+      - '1884:1883'
+      - '8082:8082'
+      - '8884:8883'
+
+networks:
+  region-a:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+  region-b:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
