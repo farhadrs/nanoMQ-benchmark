@@ -7,10 +7,14 @@ services:
         ipv4_address: 192.168.1.10
       region-b:
         ipv4_address: 192.168.2.20
+      region-c:
+        ipv4_address: 192.168.3.30
     ports:
       - '1883:1883'
       - '8081:8081'
       - '8883:8883'
+    volumes:
+      - ./config/region-a/nanomq.conf:/etc/nanomq.conf
 
   broker-2:
     image: emqx/nanomq:0.18.2-full
@@ -20,10 +24,34 @@ services:
         ipv4_address: 192.168.1.20
       region-b:
         ipv4_address: 192.168.2.10
+      region-c:
+        ipv4_address: 192.168.3.20
     ports:
       - '1884:1883'
       - '8082:8082'
       - '8884:8883'
+    volumes:
+      - ./config/region-b/nanomq.conf:/etc/nanomq.conf
+
+  broker-3:
+    image: emqx/nanomq:0.18.2-full
+    container_name: region-c-broker-3
+    networks:
+      region-c:
+        ipv4_address: 192.168.3.10
+      region-a:
+        ipv4_address: 192.168.1.30
+      region-b:
+        ipv4_address: 192.168.2.30
+    ports:
+      - '1885:1883'
+      - '8083:8083'
+      - '8885:8883'
+    volumes:
+      - ./config/region-c/nanomq.conf:/etc/nanomq.conf
+#    depends_on:
+#      - broker-1
+#      - broker-2
 
 networks:
   region-a:
@@ -36,3 +64,8 @@ networks:
     ipam:
       config:
         - subnet: 192.168.2.0/24
+  region-c:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.3.0/24
